@@ -5,6 +5,12 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlencode, urljoin
 from fastapi.middleware.cors import CORSMiddleware
 import re
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 app = FastAPI()
 
@@ -19,6 +25,69 @@ app.add_middleware(
 class Item(BaseModel):
     name: str
     website: str
+
+def search_item_bestbuy(item_name):
+    # Initialize the Chrome driver
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service)
+
+    try:
+        # Construct the Best Buy search page URL with the item name
+        search_url = f"https://www.bestbuy.com/site/searchpage.jsp?st={item_name}"
+        driver.get(search_url)
+
+        # Wait for the search results to load
+        wait = WebDriverWait(driver, 10)
+        first_result = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.list-item.lv")))
+
+        # Get the URL of the first search result
+        first_result_link = first_result.find_element(By.CSS_SELECTOR, "a.image-link")
+        first_result_url = first_result_link.get_attribute("href")
+
+        # Get the name of the first search result item
+        first_result_name = first_result.find_element(By.CSS_SELECTOR, "h4.sku-title > a").text
+
+        return first_result_url, first_result_name
+
+    except Exception as e:
+        print(f'An error occurred: {e}')
+    finally:
+        # Close the browser
+        driver.quit()
+
+    return None, None
+
+def get_item_price_bestbuy(url):
+    # Initialize the Chrome driver
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service)
+
+    try:
+        # Navigate to the product page
+        driver.get(url)
+
+        # Wait for the price element to be present
+        wait = WebDriverWait(driver, 10)
+        price_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.priceView-hero-price.priceView-customer-price > span[aria-hidden="true"]')))
+
+        # Get the page source HTML
+        html = driver.page_source
+
+        # Parse the HTML with BeautifulSoup
+        soup = BeautifulSoup(html, 'html.parser')
+
+        # Extract the price text
+        price = price_element.text.strip('$')
+        price = price + "$"
+        return price
+
+    except Exception as e:
+        print(f'An error occurred: {e}')
+    finally:
+        # Close the browser
+        driver.quit()
+
+    return None
 
 def search_item_walmart(item_name):
     search_url = 'https://www.walmart.com/search?' + urlencode({'q': item_name})
@@ -171,5 +240,15 @@ def search_item(item: Item):
                 return {"website": "Newegg", "url": "", "title": item_title, "price": "Price not found"}
         else:
             return {"website": "Newegg", "url": "", "title": item.name, "price": "No search results found"}
+    elif item.website == "bestbuy":
+        item_url, item_title = search_item_bestbuy(item.name)
+        if item_url:
+            price = get_item_price_bestbuy(item_url)
+            if price:
+                return {"website": "Best Buy", "url": item_url, "title": item_title, "price": price}
+            else:
+                return {"website": "Best Buy", "url": "", "title": item_title, "price": "Price not found"}
+        else:
+            return {"website": "Best Buy", "url": "", "title": item.name, "price": "No search results found"}
     else:
         return {"website": item.website, "url": "", "title": item.name, "price": "Unsupported website"}

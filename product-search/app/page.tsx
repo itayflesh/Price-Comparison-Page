@@ -23,7 +23,11 @@ const ProductSearch = () => {
         name: productName,
         website: 'newegg',
       });
-      setSearchResults([walmartResponse.data, neweggResponse.data]);
+      const bestbuyResponse = await axios.post<SearchResult>('http://localhost:8000/search', {
+        name: productName,
+        website: 'bestbuy',
+      });
+      setSearchResults([walmartResponse.data, neweggResponse.data, bestbuyResponse.data]);
     } catch (error) {
       console.error('Error searching for product:', error);
     }
@@ -62,9 +66,18 @@ const ProductSearch = () => {
               <tr key={index}>
                 <td className="border px-4 py-2">{result.website}</td>
                 <td className="border px-4 py-2">
-                  <a href={result.url} target="_blank" rel="noopener noreferrer">
-                    {result.title}
-                  </a>
+                  {result.price !== 'Price not found' && result.price !== 'No search results found' ? (
+                    <a
+                      href={result.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 underline"
+                    >
+                      {result.title}
+                    </a>
+                  ) : (
+                    <span>{result.title}</span>
+                  )}
                 </td>
                 <td className="border px-4 py-2">{result.price}</td>
               </tr>

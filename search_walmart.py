@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlencode
+import re
 
 from urllib.parse import urljoin
 
@@ -58,11 +59,19 @@ def get_item_price(url):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     price_element = soup.find('span', {'itemprop': 'price'})
+    print(soup)
     if price_element:
-        price = price_element.text.strip()
-        return price
+        price_text = price_element.text.strip()
+        price_match = re.search(r'\$?(\d+(?:,\d+)*(?:\.\d+)?)', price_text) 
+        if price_match:
+            price = price_match.group(1).replace(',', '')
+            price = price + "$"
+            return price
+        else:
+            print("Price not found in the extracted text.")
+            return None
     else:
-        print("Price not found on the page.")
+        print("Price element not found on the page.")
         return None
 
 # Example usage
