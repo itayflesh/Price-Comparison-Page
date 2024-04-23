@@ -31,6 +31,7 @@ def search_item(item_name):
         relative_url = first_result['href']
         base_url = 'https://www.walmart.com'
         item_url = urljoin(base_url, relative_url)
+        print(first_result.find('span', class_='w_iUH7').text.strip())
         return item_url
     else:
         print("No search results found.")

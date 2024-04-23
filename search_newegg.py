@@ -27,6 +27,7 @@ def search_item(item_name):
     first_result = soup.select_one('div.item-cell a.item-title')
     if first_result:
         item_url = first_result['href']
+        print(first_result.text.strip())
         return item_url
     else:
         print("No search results found.")
