@@ -32,8 +32,8 @@ def search_item_bestbuy(item_name):
     driver = webdriver.Chrome(service=service)
 
     try:
-        # Construct the Best Buy search page URL with the item name
-        search_url = f"https://www.bestbuy.com/site/searchpage.jsp?st={item_name}"
+        # Construct the Best Buy search page URL with the item name and intl=nosplash
+        search_url = f"https://www.bestbuy.com/site/searchpage.jsp?st={item_name}&intl=nosplash"
         driver.get(search_url)
 
         # Wait for the search results to load
@@ -63,8 +63,11 @@ def get_item_price_bestbuy(url):
     driver = webdriver.Chrome(service=service)
 
     try:
+        
+        product_url = f"{url}&intl=nosplash"
+
         # Navigate to the product page
-        driver.get(url)
+        driver.get(product_url)
 
         # Wait for the price element to be present
         wait = WebDriverWait(driver, 10)
@@ -78,7 +81,6 @@ def get_item_price_bestbuy(url):
 
         # Extract the price text
         price = price_element.text.strip('$')
-        price = price + "$"
         return price
 
     except Exception as e:
