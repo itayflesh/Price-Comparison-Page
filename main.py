@@ -81,6 +81,7 @@ def get_item_price_bestbuy(url):
 
         # Extract the price text
         price = price_element.text.strip('$')
+        price = price + "$"
         return price
 
     except Exception as e:
