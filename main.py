@@ -158,7 +158,7 @@ def get_item_price_walmart(url):
         return None
 
 def search_item_newegg(item_name):
-    search_url = 'https://www.newegg.com/p/pl?' + urlencode({'d': item_name, 'N': 4131})
+    search_url = 'https://www.newegg.com/p/pl?' + urlencode({'d': item_name})
     
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36',
@@ -245,10 +245,10 @@ def search_item(item: Item):
         if item_url:
             price = get_item_price_bestbuy(item_url)
             if price:
-                return {"website": "Best Buy", "url": item_url, "title": item_title, "price": price}
+                return {"website": "BestBuy", "url": item_url, "title": item_title, "price": price}
             else:
-                return {"website": "Best Buy", "url": "", "title": item_title, "price": "Price not found"}
+                return {"website": "BestBuy", "url": "", "title": item_title, "price": "Price not found"}
         else:
-            return {"website": "Best Buy", "url": "", "title": item.name, "price": "No search results found"}
+            return {"website": "BestBuy", "url": "", "title": item.name, "price": "No search results found"}
     else:
         return {"website": item.website, "url": "", "title": item.name, "price": "Unsupported website"}
