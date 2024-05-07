@@ -114,7 +114,7 @@ def search_item_walmart(item_name):
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    first_result = soup.find('a', class_='absolute w-100 h-100 z-1 hide-sibling-opacity')
+    first_result = soup.find('a', class_='absolute w-100 h-100 z-1 hide-sibling-opacity z-2')
     if first_result:
         relative_url = first_result['href']
         base_url = 'https://www.walmart.com'

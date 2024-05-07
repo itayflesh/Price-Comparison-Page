@@ -8,6 +8,8 @@ from urllib.parse import urljoin
 def search_item(item_name):
     search_url = 'https://www.walmart.com/search?' + urlencode({'q': item_name})
     
+    print(search_url)
+    
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
@@ -27,7 +29,9 @@ def search_item(item_name):
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    first_result = soup.find('a', class_='absolute w-100 h-100 z-1 hide-sibling-opacity')
+
+    first_result = soup.find('a', class_='absolute w-100 h-100 z-1 hide-sibling-opacity z-2')
+    print(first_result)
     if first_result:
         relative_url = first_result['href']
         base_url = 'https://www.walmart.com'
